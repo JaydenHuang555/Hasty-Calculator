@@ -2,16 +2,27 @@ use std::fmt::Display;
 
 type Action = fn(f64, f64) -> f64;
 
-pub struct OperatorExecutable<'a> {
-    display_value: &'a str,
+pub const fn prec(value: char) -> u32 {
+    match value {
+        '+' | '-' => 1,
+        '*' | '/' | '%' => 2,
+        '^' => 3,
+        _ => 0
+    } 
+}
+
+pub struct OperatorExecutable {
+    display_value: char,
+    prec: u32,
     action: Action
 }
 
-impl<'a> OperatorExecutable<'a> {
+impl OperatorExecutable {
 
-    pub const fn new(display_value: &'a str, action: Action) -> Self {
+    pub const fn new(display_value: char, prec: u32, action: Action) -> Self {
         Self {
             display_value,
+            prec,
             action: action
         }
     }
@@ -20,9 +31,13 @@ impl<'a> OperatorExecutable<'a> {
         (self.action)(left, right)
     }
 
+    pub fn prec(&self) -> u32 {
+        self.prec
+    }
+
 }
 
-impl<'a> Display for OperatorExecutable<'a> {
+impl Display for OperatorExecutable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.display_value)
     }
