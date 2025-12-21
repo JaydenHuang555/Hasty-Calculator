@@ -1,7 +1,6 @@
 use crate::token::Token;
 
 pub fn eval(buffer: &Vec<Token>) -> f64 {
-
     let mut stack: Vec<f64> = Vec::new();
 
     for token in buffer {
@@ -21,6 +20,4 @@ pub fn eval(buffer: &Vec<Token>) -> f64 {
     }
 
     stack.pop().unwrap()
-
-
 }

@@ -9,7 +9,7 @@ pub mod parantheses;
 pub enum Token {
     Num(f64),
     Operator(OperatorExecutable),
-    Parentheses(ParanthesesType)
+    Parentheses(ParanthesesType),
 }
 
 impl Display for Token {
@@ -17,7 +17,7 @@ impl Display for Token {
         match self {
             Self::Num(operand) => operand.fmt(f),
             Self::Operator(executable) => executable.fmt(f),
-            Self::Parentheses(parantheses_type) => parantheses_type.fmt(f)
+            Self::Parentheses(parantheses_type) => parantheses_type.fmt(f),
         }
     }
 }

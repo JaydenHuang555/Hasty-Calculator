@@ -7,24 +7,23 @@ pub const fn prec(value: char) -> u32 {
         '+' | '-' => 1,
         '*' | '/' | '%' => 2,
         '^' => 3,
-        _ => 0
-    } 
+        _ => 0,
+    }
 }
 
 #[derive(Clone, Copy)]
 pub struct OperatorExecutable {
     display_value: char,
     prec: u32,
-    action: Action
+    action: Action,
 }
 
 impl OperatorExecutable {
-
     pub const fn new(display_value: char, prec: u32, action: Action) -> Self {
         Self {
             display_value,
             prec,
-            action: action
+            action: action,
         }
     }
 
@@ -35,7 +34,6 @@ impl OperatorExecutable {
     pub fn prec(&self) -> u32 {
         self.prec
     }
-
 }
 
 impl Display for OperatorExecutable {
