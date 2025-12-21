@@ -1,6 +1,6 @@
 use crate::token::Token;
 
-pub fn eval(buffer: &Vec<Token>) -> f64{
+pub fn eval(buffer: &Vec<Token>) -> f64 {
 
     let mut stack: Vec<f64> = Vec::new();
 

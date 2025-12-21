@@ -11,11 +11,17 @@ pub enum LexState {
 
 impl LexState {
 
-    pub fn get(input: char) -> Self {
+    pub fn proceed(last_output: LexState, input: char) -> Self {
         match input {
             '1' | '2' | '3' | '4' | '5' |
             '6' | '7' | '8' | '9' | '0' => Self::BuildOperand,
-            '+' | '-' | '*' | '/' => Self::BuildOperator,
+            '+' | '*' | '/' => Self::BuildOperator,
+            '-' => {
+                match last_output {
+                    Self::BuildOperand => Self::BuildOperator,
+                    _ => Self::BuildOperand
+                }
+            }
             '('  => Self::PushParantheses,
             ')' => Self::SeekParantheses,
             _ => Self::Unknown
@@ -42,10 +48,12 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
     let mut operators: Vec<Token> = Vec::new();
 
     let mut builder = String::new();
+
+    let mut prev_state = LexState::Nothing;
     
     for (index, value) in infix_equation.chars().enumerate() {
-        let state = LexState::get(value);
-        match state {
+        let current_state = LexState::proceed(prev_state, value);
+        match current_state {
             LexState::Unknown | LexState::Nothing => {},
             LexState::PushParantheses => {
                 operators.push(Token::Parentheses(ParanthesesType::Open));
@@ -121,6 +129,7 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
                 operators.push(Token::Operator(executables::match_char_with_executable(value).unwrap()));
             },
         }
+        prev_state = current_state;
     }
 
     if !buffer.is_empty() {
