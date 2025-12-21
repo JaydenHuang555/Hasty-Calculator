@@ -14,6 +14,9 @@ pub fn eval(buffer: &Vec<Token>) -> f64{
                 let left = stack.pop().unwrap();
                 stack.push(executable.execute(left, right));
             }
+            _ => {
+                panic!("Found error with token {}", token);
+            }
         }
     }
 

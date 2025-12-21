@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 
 
+#[derive(Clone, Copy)]
 pub enum ParanthesesType {
     Open,
     Close,

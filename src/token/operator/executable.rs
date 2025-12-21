@@ -11,6 +11,7 @@ pub const fn prec(value: char) -> u32 {
     } 
 }
 
+#[derive(Clone, Copy)]
 pub struct OperatorExecutable {
     display_value: char,
     prec: u32,

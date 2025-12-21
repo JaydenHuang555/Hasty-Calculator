@@ -5,6 +5,7 @@ use crate::token::{operator::executable::OperatorExecutable, parantheses::Parant
 pub mod operator;
 pub mod parantheses;
 
+#[derive(Clone, Copy)]
 pub enum Token {
     Num(f64),
     Operator(OperatorExecutable),
