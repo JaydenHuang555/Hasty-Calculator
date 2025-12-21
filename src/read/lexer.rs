@@ -1,10 +1,5 @@
 use crate::token::{
     Token,
-    operator::{
-        self,
-        executable::{OperatorExecutable, prec},
-        executables::{self, match_char_with_executable},
-    },
     parantheses::ParanthesesType,
 };
 
@@ -41,7 +36,7 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
 
     let mut prev_state = LexState::Nothing;
 
-    for (index, value) in infix_equation.chars().enumerate() {
+    for value in infix_equation.chars() {
         let current_state = LexState::proceed(prev_state, value);
         match current_state {
             LexState::Unknown | LexState::Nothing => {}
@@ -91,7 +86,7 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
                     let peek = operators.last().unwrap();
                     match peek {
                         Token::Operator(executable) => {
-                            if executable.prec() > prec(value) {
+                            if executable.prec() > crate::token::operator::executable::prec(value) {
                                 buffer.push(*peek);
                                 operators.pop();
                             } else {
@@ -112,7 +107,7 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
                     }
                 }
                 operators.push(Token::Operator(
-                    executables::match_char_with_executable(value).unwrap(),
+                    crate::token::operator::executables::match_char_with_executable(value).unwrap(),
                 ));
             }
         }

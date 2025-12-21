@@ -23,7 +23,7 @@ impl OperatorExecutable {
         Self {
             display_value,
             prec,
-            action: action,
+            action,
         }
     }
 
