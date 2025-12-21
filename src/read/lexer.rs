@@ -33,18 +33,6 @@ impl LexState {
     }
 }
 
-pub fn prec_chars(value: char) -> i32 {
-    match value {
-        '(' | ')' => -1,
-        _ => {
-            let precedence = prec(value);
-            match precedence {
-                _ => precedence as i32,
-            }
-        }
-    }
-}
-
 pub fn postfix(infix_equation: &str) -> Vec<Token> {
     let mut buffer: Vec<Token> = Vec::new();
     let mut operators: Vec<Token> = Vec::new();
