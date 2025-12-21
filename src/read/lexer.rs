@@ -1,7 +1,4 @@
-use crate::token::{
-    Token,
-    parantheses::ParanthesesType,
-};
+use crate::token::{Token, parantheses::ParanthesesType};
 
 pub enum LexState {
     Unknown,
