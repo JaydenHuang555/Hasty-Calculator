@@ -83,6 +83,12 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
             }
 
             LexState::BuildOperand => {
+                match prev_state {
+                    LexState::SeekParantheses => {
+                        operators.push(Token::Operator(executables::MULTI))
+                    }
+                    _ => {}
+                }
                 builder.push(value);
             }
             LexState::BuildOperator => {
