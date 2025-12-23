@@ -1,5 +1,6 @@
-use crate::token::{Token, parantheses::ParanthesesType};
+use crate::token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType};
 
+#[derive(PartialEq)]
 pub enum LexState {
     Unknown,
     Nothing,
@@ -10,7 +11,7 @@ pub enum LexState {
 }
 
 impl LexState {
-    pub fn proceed(last_output: LexState, input: char) -> Self {
+    pub fn proceed(last_output: &LexState, input: char) -> Self {
         match input {
             '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => Self::BuildOperand,
             '+' | '*' | '/' => Self::BuildOperator,
@@ -34,10 +35,20 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
     let mut prev_state = LexState::Nothing;
 
     for value in infix_equation.chars() {
-        let current_state = LexState::proceed(prev_state, value);
+        let current_state = LexState::proceed(&prev_state, value);
         match current_state {
             LexState::Unknown | LexState::Nothing => {}
             LexState::PushParantheses => {
+
+                if prev_state == LexState::BuildOperand {
+                    if !builder.is_empty() {
+                        let numeric_value = builder.parse().expect("Unable to parse num to f64");
+                        buffer.push(Token::Num(numeric_value));
+                        builder.clear();
+                    }
+                    operators.push(Token::Operator(executables::MULTI));
+                }
+
                 operators.push(Token::Parentheses(ParanthesesType::Open));
             }
 
@@ -47,6 +58,7 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
                     buffer.push(Token::Num(numeric_value));
                     builder.clear();
                 }
+
                 while !operators.is_empty() {
                     let peek = operators.last().expect("Unable to get last");
                     match peek {
