@@ -14,7 +14,7 @@ impl LexState {
     pub fn proceed(last_output: &LexState, input: char) -> Self {
         match input {
             '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => Self::BuildOperand,
-            '+' | '*' | '/' => Self::BuildOperator,
+            '+' | '*' | '/' | '^' => Self::BuildOperator,
             '-' => match last_output {
                 Self::BuildOperand => Self::BuildOperator,
                 _ => Self::BuildOperand,

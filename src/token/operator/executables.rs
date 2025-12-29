@@ -30,6 +30,7 @@ pub const fn match_char_with_executable(value: char) -> Option<OperatorExecutabl
         '-' => Option::Some(SUB),
         '*' => Option::Some(MULTI),
         '/' => Option::Some(DIV),
+        '^' => Option::Some(EXPONENT),
         _ => Option::None,
     }
 }
