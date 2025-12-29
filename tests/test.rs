@@ -2,7 +2,7 @@ use hastycalc::{eval, read::lexer, token::operator::executables};
 
 #[test]
 fn test() {
-    let result = lexer::postfix("2 * (-10+3)2");
+    let result = lexer::postfix("4*2^3");
     for token in &result {
         println!("{}", token);
     }
