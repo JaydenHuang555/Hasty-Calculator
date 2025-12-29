@@ -1,4 +1,4 @@
-use hastycalc::{eval, read::lexer};
+use hastycalc::{eval, read::lexer, token::operator::executables};
 
 #[test]
 fn test() {
@@ -8,4 +8,5 @@ fn test() {
     }
     let end = eval::eval(&result);
     println!("{}", end);
+    println!("{}", executables::EXPONENT.execute(2.0, 0.5));
 }
