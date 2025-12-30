@@ -23,7 +23,9 @@ impl Display for OperandLexerError {
 pub enum LexerError {
     UnknownNextLexState(LexState, char),
     OperandError(OperandLexerError),
-    OperatorStackCorrupted(Token)
+    OperatorStackCorrupted(Token),
+    EmptyOperatorStack,
+    InvalidOperatorDetectedAsOperator(char)
 }
 
 impl Error for LexerError {}
@@ -34,7 +36,9 @@ impl Display for LexerError {
        match self {
             Self::UnknownNextLexState(last_output, input) => write!(f, "Unknown next lex state (last output: {:?}, input: {})", last_output, input),
             Self::OperandError(err) => err.fmt(f),
-            Self::OperatorStackCorrupted(token) => write!(f, "Operator stack is corrupted with {} detected", token)
+            Self::OperatorStackCorrupted(token) => write!(f, "Operator stack is corrupted with {} detected", token),
+            Self::EmptyOperatorStack => write!(f, "Trying to pop from an empty operator stack"),
+            Self::InvalidOperatorDetectedAsOperator(op) => write!(f, "Invalid Operator {} detected as an operator", op)
        }
     }
 }

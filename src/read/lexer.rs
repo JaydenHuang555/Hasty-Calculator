@@ -70,19 +70,23 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                 }
 
                 while !operators.is_empty() {
-                    let peek = operators.last().expect("Unable to get last");
-                    match peek {
-                        Token::Operator(_) => {
-                            buffer.push(*peek);
-                            operators.pop();
-                        }
-                        Token::Parentheses(parantheses_type) => {
-                            if *parantheses_type == ParanthesesType::Open {
-                                operators.pop();
-                                break;
+                    match operators.last() {
+                        Option::Some(peek) => {
+                            match peek {
+                                Token::Operator(_) => {
+                                    buffer.push(*peek);
+                                    operators.pop();
+                                }
+                                Token::Parentheses(parantheses_type) => {
+                                    if *parantheses_type == ParanthesesType::Open {
+                                        operators.pop();
+                                        break;
+                                    }
+                                }
+                                _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
                             }
-                        }
-                        _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
+                        },
+                        Option::None => return Result::Err(LexerError::EmptyOperatorStack)
                     }
                 }
             }
@@ -107,27 +111,32 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                     }
                 }
                 while !operators.is_empty() {
-                    let peek = operators.last().unwrap();
-                    match peek {
-                        Token::Operator(executable) => {
-                            if executable.prec() >= crate::token::operator::executable::prec(value) {
-                                buffer.push(*peek);
-                                operators.pop();
-                            } else {
-                                break;
+                    match operators.last() {
+                        Option::None => return Result::Err(LexerError::EmptyOperatorStack),
+                        Option::Some(peek) => {
+                            match peek {
+                                Token::Operator(executable) => {
+                                    if executable.prec() >= crate::token::operator::executable::prec(value) {
+                                        buffer.push(*peek);
+                                        operators.pop();
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                Token::Parentheses(parantheses_type) => {
+                                    if *parantheses_type == ParanthesesType::Open {
+                                        break;
+                                    }
+                                }
+                                _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
                             }
                         }
-                        Token::Parentheses(parantheses_type) => {
-                            if *parantheses_type == ParanthesesType::Open {
-                                break;
-                            }
-                        }
-                        _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
                     }
                 }
-                operators.push(Token::Operator(
-                    crate::token::operator::executables::match_char_with_executable(value).unwrap(),
-                ));
+                match executables::match_char_with_executable(value) {
+                    Option::Some(executable) => operators.push(Token::Operator(executable)),
+                    Option::None => return Result::Err(LexerError::InvalidOperatorDetectedAsOperator(value))
+                }
             }
         }
         prev_state = current_state;
@@ -142,7 +151,6 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
             Err(_) => return Result::Err(LexerError::OperandError(OperandLexerError::InvalidNumericOperandConversion(builder))),
         }
     }
-    
 
     while !operators.is_empty() {
         match operators.pop() {
@@ -150,9 +158,7 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                 Token::Operator(_) => buffer.push(token),
                 _ => return Result::Err(LexerError::OperatorStackCorrupted(token))
             },
-            Option::None => {
-                break;
-            }
+            Option::None => return Result::Err(LexerError::EmptyOperatorStack)
         }
     }
 
