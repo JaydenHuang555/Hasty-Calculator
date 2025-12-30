@@ -1,6 +1,8 @@
-use std::fmt::Display;
+use std::{error::Error, fmt::Display};
 
-type Action = fn(f64, f64) -> f64;
+use crate::token::operator::error::OperatorError;
+
+type Action = fn(f64, f64) -> Result<f64, OperatorError>;
 
 pub const fn prec(value: char) -> u32 {
     match value {
@@ -27,7 +29,7 @@ impl OperatorExecutable {
         }
     }
 
-    pub fn execute(&self, left: f64, right: f64) -> f64 {
+    pub fn execute(&self, left: f64, right: f64) -> Result<f64, OperatorError> {
         (self.action)(left, right)
     }
 
