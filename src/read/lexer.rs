@@ -1,4 +1,4 @@
-use crate::{read::errror::{LexerError, OperandLexerError}, token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType}};
+use crate::{read::error::{LexerError, OperandLexerError}, token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType}};
 
 #[derive(PartialEq)]
 pub enum LexState {
