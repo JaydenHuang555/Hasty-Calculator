@@ -2,7 +2,7 @@ use hastycalc::{eval::{self, evaluate}, read::lexer, token::operator::executable
 
 #[test]
 fn test() {
-    match lexer::postfix("2.5*2") {
+    match lexer::postfix("2.5*2*9(32 + 32) / 16 * 90") {
         Result::Ok(output) => {
             print!("Postfix tokens: ");
             for token in &output {
