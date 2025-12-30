@@ -6,7 +6,6 @@ fn test() {
     for token in &result {
         println!("{}", token);
     }
-    let end = eval::eval(&result);
-    println!("{}", end);
-    println!("{}", executables::EXPONENT.execute(2.0, 0.5));
+    let end = eval::evaluate::evaluate(&result);
+    println!("{}", end.unwrap());
 }
