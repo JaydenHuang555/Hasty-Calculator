@@ -110,7 +110,7 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                     let peek = operators.last().unwrap();
                     match peek {
                         Token::Operator(executable) => {
-                            if executable.prec() > crate::token::operator::executable::prec(value) {
+                            if executable.prec() >= crate::token::operator::executable::prec(value) {
                                 buffer.push(*peek);
                                 operators.pop();
                             } else {
