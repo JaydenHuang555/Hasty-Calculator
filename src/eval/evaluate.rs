@@ -12,9 +12,7 @@ pub fn evaluate(buffer: &Vec<Token>) -> Result<f64, EvaluateError> {
                 let right = stack.pop().unwrap();
                 let left = stack.pop().unwrap();
                 match executable.execute(left, right) {
-                    Result::Ok(output) => {
-                        stack.push(output)
-                    },
+                    Result::Ok(output) => stack.push(output),
                     Result::Err(err) => {
                         return Result::Err(EvaluateError::OperationError(err));
                     }
@@ -28,6 +26,6 @@ pub fn evaluate(buffer: &Vec<Token>) -> Result<f64, EvaluateError> {
 
     match stack.last() {
         Option::None => Result::Err(EvaluateError::NoPeek),
-        Option::Some(operand) => Result::Ok(*operand)
+        Option::Some(operand) => Result::Ok(*operand),
     }
 }
