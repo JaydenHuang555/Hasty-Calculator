@@ -1,6 +1,6 @@
 use crate::{read::error::{LexerError, OperandLexerError}, token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType}};
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum LexState {
     Unknown,
     Nothing,
@@ -13,6 +13,7 @@ pub enum LexState {
 impl LexState {
     pub fn proceed(last_output: &LexState, input: char) -> Self {
         match input {
+            ' ' => Self::Nothing,
             '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | '.' => Self::BuildOperand,
             '+' | '*' | '/' | '^' => Self::BuildOperator,
             '-' => match last_output {
@@ -37,7 +38,8 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
     for value in infix_equation.chars() {
         let current_state = LexState::proceed(&prev_state, value);
         match current_state {
-            LexState::Unknown | LexState::Nothing => {}
+            LexState::Nothing => {},
+            LexState::Unknown => return Result::Err(LexerError::UnknownNextLexState(prev_state, value)),
             LexState::PushParantheses => {
 
                 if prev_state == LexState::BuildOperand {
@@ -74,18 +76,13 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                             buffer.push(*peek);
                             operators.pop();
                         }
-                        Token::Parentheses(parantheses_type) => match parantheses_type {
-                            ParanthesesType::Open => {
+                        Token::Parentheses(parantheses_type) => {
+                            if *parantheses_type == ParanthesesType::Open {
                                 operators.pop();
                                 break;
                             }
-                            ParanthesesType::Close => {
-                                panic!("Detected Corrupted Postfix")
-                            }
-                        },
-                        _ => {
-                            panic!("Type is not an operator")
                         }
+                        _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
                     }
                 }
             }
@@ -120,17 +117,12 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
                                 break;
                             }
                         }
-                        Token::Parentheses(parantheses_type) => match parantheses_type {
-                            ParanthesesType::Open => {
+                        Token::Parentheses(parantheses_type) => {
+                            if *parantheses_type == ParanthesesType::Open {
                                 break;
                             }
-                            ParanthesesType::Close => {
-                                panic!("Corrupted operations stack!!");
-                            }
-                        },
-                        _ => {
-                            panic!("Corrupted postfix!!");
                         }
+                        _ => return Result::Err(LexerError::OperatorStackCorrupted(*peek))
                     }
                 }
                 operators.push(Token::Operator(
@@ -155,20 +147,8 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
     while !operators.is_empty() {
         match operators.pop() {
             Option::Some(token) => match token {
-                Token::Operator(_) => {
-                    buffer.push(token);
-                }
-                Token::Parentheses(parantheses) => match parantheses {
-                    ParanthesesType::Open => {
-                        panic!("Unclosed parantheses")
-                    }
-                    ParanthesesType::Close => {
-                        panic!("Unopened parantheses")
-                    }
-                },
-                _ => {
-                    panic!("Corrupted stack");
-                }
+                Token::Operator(_) => buffer.push(token),
+                _ => return Result::Err(LexerError::OperatorStackCorrupted(token))
             },
             Option::None => {
                 break;
