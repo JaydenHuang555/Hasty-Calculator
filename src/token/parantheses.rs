@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Clone, Copy)]
+#[derive(Debug,Clone, Copy)]
 pub enum ParanthesesType {
     Open,
     Close,
