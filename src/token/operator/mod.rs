@@ -1,2 +1,3 @@
+pub mod error;
 pub mod executable;
 pub mod executables;
