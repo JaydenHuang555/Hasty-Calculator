@@ -21,7 +21,7 @@ pub fn evaluate(buffer: &Vec<Token>) -> Result<f64, EvaluateError> {
                 }
             }
             _ => {
-                return Result::Err(EvaluateError::InvalidToken(token.clone()));
+                return Result::Err(EvaluateError::InvalidToken(*token));
             }
         }
     }

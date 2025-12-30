@@ -1,4 +1,4 @@
-use crate::{read::error::{LexerError, OperandLexerError}, token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType}};
+use crate::{read::error::{LexerError, OperandLexerError}, token::{Token, operator::executables, parantheses::ParanthesesType}};
 
 #[derive(Debug, PartialEq)]
 pub enum LexState {
@@ -92,11 +92,8 @@ pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
             }
 
             LexState::BuildOperand => {
-                match prev_state {
-                    LexState::SeekParantheses => {
-                        operators.push(Token::Operator(executables::MULTI))
-                    }
-                    _ => {}
+                if prev_state == LexState::SeekParantheses {
+                    operators.push(Token::Operator(executables::MULTI));
                 }
                 builder.push(value);
             }
