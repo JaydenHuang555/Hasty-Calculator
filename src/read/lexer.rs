@@ -1,4 +1,4 @@
-use crate::token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType};
+use crate::{read::errror::{LexerError, OperandLexerError}, token::{Token, operator::{executable::OperatorExecutable, executables}, parantheses::ParanthesesType}};
 
 #[derive(PartialEq)]
 pub enum LexState {
@@ -26,7 +26,7 @@ impl LexState {
     }
 }
 
-pub fn postfix(infix_equation: &str) -> Vec<Token> {
+pub fn postfix(infix_equation: &str) -> Result<Vec<Token>, LexerError> {
     let mut buffer: Vec<Token> = Vec::new();
     let mut operators: Vec<Token> = Vec::new();
 
@@ -42,9 +42,13 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
 
                 if prev_state == LexState::BuildOperand {
                     if !builder.is_empty() {
-                        let numeric_value = builder.parse().expect("Unable to parse num to f64");
-                        buffer.push(Token::Num(numeric_value));
-                        builder.clear();
+                        match builder.parse::<f64>()  {
+                            Ok(numeric_value) => {
+                                buffer.push(Token::Num(numeric_value));
+                                builder.clear();
+                            },
+                            Err(_) => return Result::Err(LexerError::OperandError(OperandLexerError::InvalidNumericOperandConversion(builder))),
+                        }
                     }
                     operators.push(Token::Operator(executables::MULTI));
                 }
@@ -54,9 +58,13 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
 
             LexState::SeekParantheses => {
                 if !builder.is_empty() {
-                    let numeric_value = builder.parse().expect("Unable to parse num to f64");
-                    buffer.push(Token::Num(numeric_value));
-                    builder.clear();
+                    match builder.parse::<f64>()  {
+                        Ok(numeric_value) => {
+                            buffer.push(Token::Num(numeric_value));
+                            builder.clear();
+                        },
+                        Err(_) => return Result::Err(LexerError::OperandError(OperandLexerError::InvalidNumericOperandConversion(builder))),
+                    }
                 }
 
                 while !operators.is_empty() {
@@ -93,9 +101,13 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
             }
             LexState::BuildOperator => {
                 if !builder.is_empty() {
-                    let numeric_value = builder.parse().expect("Unable to parse num to f64");
-                    buffer.push(Token::Num(numeric_value));
-                    builder.clear();
+                    match builder.parse::<f64>()  {
+                        Ok(numeric_value) => {
+                            buffer.push(Token::Num(numeric_value));
+                            builder.clear();
+                        },
+                        Err(_) => return Result::Err(LexerError::OperandError(OperandLexerError::InvalidNumericOperandConversion(builder))),
+                    }
                 }
                 while !operators.is_empty() {
                     let peek = operators.last().unwrap();
@@ -129,11 +141,16 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
         prev_state = current_state;
     }
 
-    if !buffer.is_empty() {
-        let numeric_value = builder.parse().expect("Unable to parse number to a f64");
-        buffer.push(Token::Num(numeric_value));
-        builder.clear();
+    if !builder.is_empty() {
+        match builder.parse::<f64>()  {
+            Ok(numeric_value) => {
+                buffer.push(Token::Num(numeric_value));
+                builder.clear();
+            },
+            Err(_) => return Result::Err(LexerError::OperandError(OperandLexerError::InvalidNumericOperandConversion(builder))),
+        }
     }
+    
 
     while !operators.is_empty() {
         match operators.pop() {
@@ -159,5 +176,5 @@ pub fn postfix(infix_equation: &str) -> Vec<Token> {
         }
     }
 
-    buffer
+    Result::Ok(buffer)
 }
